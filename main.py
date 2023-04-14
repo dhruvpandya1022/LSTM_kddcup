@@ -5,6 +5,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
+import tensorflow as tf
 from tensorflow.keras.layers import LSTM, Dense
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,6 +13,14 @@ from sklearn.preprocessing import MinMaxScaler
 
 # Load dataset
 # data = pd.read_csv('kddcup.data_10_percent_corrected')
+
+# tf.debugging.set_log_device_placement(True)
+physical_devices = tf.config.list_physical_devices('GPU')
+if len(physical_devices) > 0:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    tf.config.set_visible_devices(physical_devices[0], 'GPU')
+else:
+    print("GPU not detected")
 
 kddcup = datasets.fetch_kddcup99()
 data = pd.DataFrame(data=kddcup.data, columns=kddcup.feature_names)
@@ -27,6 +36,9 @@ num_features = ['duration', 'src_bytes', 'dst_bytes', 'hot', 'num_failed_logins'
                 'dst_host_rerror_rate', 'dst_host_srv_rerror_rate']
 
 # Encode categorical features using label encoding
+
+
+# Label Encoding
 
 le = LabelEncoder()
 for col in cat_features:
@@ -96,7 +108,7 @@ y_val_classes = np.argmax(y_val, axis=1)
 
 print(X_train.shape)
 print(y_train.shape)
-history = model.fit(X_train, y_train, epochs=50, batch_size=32, validation_data=(X_val, y_val))
+history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_data=(X_val, y_val))
 
 history_df = pd.DataFrame(history.history)
 
